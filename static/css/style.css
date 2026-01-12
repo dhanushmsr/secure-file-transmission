@@ -1,0 +1,58 @@
+body {
+    margin: 0; background-color: #f0f4f8; font-family: 'Segoe UI', sans-serif;
+    display: flex; justify-content: center; align-items: center; min-height: 100vh;
+}
+
+.container {
+    background: #ffffff; padding: 40px; border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05); width: 90%; max-width: 450px;
+    text-align: center; position: relative;
+}
+
+input, select {
+    width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd;
+    border-radius: 8px; font-size: 16px;
+}
+
+.btn {
+    background: #4a90e2; color: white; border: none; padding: 14px;
+    border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold;
+}
+
+.btn-danger { background: #ff5e5e; }
+
+.avatar {
+    font-size: 50px; margin-bottom: 10px; display: block;
+}
+
+.floating-shape {
+    position: absolute; width: 100px; height: 100px; background: rgba(74, 144, 226, 0.1);
+    border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; z-index: -1;
+    animation: rotate 10s infinite linear;
+}
+
+@keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+/* Connection Status Indicator */
+.status-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: #ff4d4d; /* Default Red */
+    box-shadow: 0 0 10px rgba(255, 77, 77, 0.5);
+    transition: all 0.3s ease;
+}
+
+.indicator.online {
+    background-color: #2ecc71; /* Success Green */
+    box-shadow: 0 0 10px rgba(46, 204, 113, 0.8);
+}

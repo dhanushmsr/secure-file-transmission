@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <title>Sender Node</title>
+</head>
+<body>
+    <div class="container">
+        <div class="status-bar">
+            <div id="connectionDot" class="indicator"></div>
+            <span id="connectionText">SYSTEM OFFLINE</span>
+        </div>
+
+        <div class="avatar">⬆️</div>
+        <h2>Sender Node</h2>
+        <form action="/upload" method="post" enctype="multipart/form-data">
+            <input type="file" name="file" required style="border: 1px solid #eee; padding: 10px;">
+            <button type="submit" class="btn">Transmit Securely</button>
+        </form>
+    </div>
+
+    <script>
+        const socket = io();
+        socket.on('connect', () => {
+            document.getElementById('connectionDot').classList.add('online');
+            document.getElementById('connectionText').innerText = "NODE READY";
+        });
+        socket.on('disconnect', () => {
+            document.getElementById('connectionDot').classList.remove('online');
+            document.getElementById('connectionText').innerText = "NODE OFFLINE";
+        });
+
+        if ("{{ success }}" === "true") alert("TRANSMISSION SUCCESSFUL!");
+    </script>
+</body>
+</html>

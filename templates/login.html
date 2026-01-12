@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="floating-shape" style="top:-50px; left:-50px;"></div>
+    <div class="container">
+        <h2>Login for File Transmission</h2>
+        <form action="/auth" method="post">
+            <select name="role" id="roleSelector" onchange="update()">
+                <option value="sender">Login as Sender</option>
+                <option value="receiver">Login as Receiver</option>
+                <option value="admin">Login as Admin</option>
+            </select>
+            <input type="password" name="password" id="pwField" placeholder="Enter Sender Password" required>
+            <button type="submit" class="btn">Enter System</button>
+        </form>
+    </div>
+    <script>
+        function update() {
+            var role = document.getElementById('roleSelector').value;
+            document.getElementById('pwField').placeholder = "Enter " + role + " Password";
+        }
+        if ("{{ error }}" === "true") alert("Error: Incorrect Password");
+    </script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <title>Admin Panel - Final</title>
+</head>
+<body>
+    <div class="container" style="max-width: 600px;">
+        <div class="status-bar">
+            <div id="connectionDot" class="indicator"></div>
+            <span id="connectionText">OFFLINE</span>
+        </div>
+
+        <div class="avatar">👤</div>
+        <h2>Admin Dashboard</h2>
+
+        <div style="text-align: left; margin-bottom: 25px;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 5px;">
+                <span>Storage Limit (500MB)</span>
+                <span>{{ used_mb }} MB Used</span>
+            </div>
+            <div style="width: 100%; height: 10px; background: #eee; border-radius: 10px; overflow: hidden;">
+                <div id="storageBar" style="height: 100%; background: #2ecc71; width: 0%; transition: width 1s;"></div>
+            </div>
+        </div>
+
+        <div style="text-align: left; margin-bottom: 25px;">
+            <h4 style="margin: 0 0 10px 0; color: #4a90e2;">Live System Activity</h4>
+            <div id="activityBox" style="height: 120px; background: #f4f7f6; border-radius: 10px; padding: 10px; font-size: 0.75rem; overflow-y: auto; color: #555; font-family: monospace;">
+                <div>[SYSTEM] Log initialized...</div>
+            </div>
+        </div>
+
+        <div style="background: #fff; padding: 20px; border-radius: 15px; border: 1px solid #eee; margin-bottom: 20px;">
+            <form action="/update_pw" method="post" style="display: flex; flex-direction: column; gap: 8px;">
+                <select name="target_role">
+                    <option value="sender">Sender</option>
+                    <option value="receiver">Receiver</option>
+                    <option value="admin">Admin</option>
+                </select>
+                <input type="text" name="new_password" placeholder="New Key" required>
+                <button type="submit" class="btn">Update Node Key</button>
+            </form>
+        </div>
+
+        <div style="text-align: left;">
+            <h4 style="margin-bottom:10px;">File Inventory</h4>
+            {% for f in files %}
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; background: #fff; border: 1px solid #eee; border-radius: 8px; margin-bottom: 5px;">
+                <span style="font-size: 0.8rem;">📄 {{ f }}</span>
+                <a href="/delete/{{ f }}" class="btn" style="width: auto; padding: 4px 10px; background: #ff5e5e; font-size: 0.7rem; text-decoration: none;">Delete</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('storageBar').style.width = "{{ percent }}%";
+        const socket = io();
+        const activityBox = document.getElementById('activityBox');
+
+        socket.on('connect', () => {
+            document.getElementById('connectionDot').classList.add('online');
+            document.getElementById('connectionText').innerText = "SYSTEM ONLINE";
+        });
+
+        // Listen for live activity logs from the server
+        socket.on('log_activity', (data) => {
+            const time = new Date().toLocaleTimeString();
+            activityBox.innerHTML += `<div>[${time}] ${data.msg}</div>`;
+            activityBox.scrollTop = activityBox.scrollHeight;
+        });
+
+        if ("{{ updated }}" === "true") alert("Security Key updated.");
+        if ("{{ deleted }}" === "true") alert("File removed.");
+    </script>
+</body>
+</html>

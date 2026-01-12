@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <title>Receiver Node</title>
+</head>
+<body>
+    <div class="container" id="mainContainer">
+        <div class="status-bar">
+            <div id="connectionDot" class="indicator"></div>
+            <span id="connectionText">SYSTEM OFFLINE</span>
+        </div>
+        
+        <div class="avatar">📡</div>
+        <h2 id="status-msg">Secure Receiver Node</h2>
+        
+        <button id="startBtn" class="btn" onclick="initializeSystem()">Initialize & Start Listening</button>
+
+        <div id="videoWrapper" style="display:none; position: relative; margin-top: 20px; border-radius: 15px; overflow: hidden; background: #000;">
+            <video id="autoPlayer" width="100%" controls playsinline>
+                <source id="videoSource" src="" type="video/mp4">
+            </video>
+            <button onclick="toggleFullScreen()" style="position: absolute; top: 10px; right: 10px; padding: 5px 10px; background: rgba(255,255,255,0.3); color: #fff; border: none; border-radius: 5px; cursor: pointer; backdrop-filter: blur(5px);">⛶ Fullscreen</button>
+        </div>
+
+        <div id="logSection" style="margin-top: 20px; text-align: left; display:none;">
+            <p style="font-size: 0.8rem; color: #4a90e2; font-weight: bold;">TRANSISSION LOG:</p>
+            <div id="logList" style="font-size: 0.8rem; color: #666; max-height: 100px; overflow-y: auto;"></div>
+        </div>
+    </div>
+
+    <audio id="alertSound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
+
+    <script>
+        const socket = io();
+        const dot = document.getElementById('connectionDot');
+        const cText = document.getElementById('connectionText');
+        const alertAudio = document.getElementById('alertSound');
+
+        // Update Green Indicator when connected
+        socket.on('connect', () => {
+            dot.classList.add('online');
+            cText.innerText = "SECURE CONNECTION ACTIVE";
+        });
+
+        socket.on('disconnect', () => {
+            dot.classList.remove('online');
+            cText.innerText = "SYSTEM OFFLINE";
+        });
+
+        function initializeSystem() {
+            document.getElementById('status-msg').innerText = "Waiting for data...";
+            document.getElementById('startBtn').style.display = "none";
+            document.getElementById('logSection').style.display = "block";
+            // Unlocks audio for the browser session
+            alertAudio.play().then(() => { alertAudio.pause(); alertAudio.currentTime = 0; });
+        }
+
+        socket.on('notify_receiver', function(data) {
+            alertAudio.play().catch(e => console.log("Sound blocked"));
+            
+            document.getElementById('status-msg').innerText = "STREAMING: " + data.filename;
+            document.getElementById('logList').innerHTML = "<div>[" + new Date().toLocaleTimeString() + "] Received " + data.filename + "</div>" + document.getElementById('logList').innerHTML;
+
+            const player = document.getElementById('autoPlayer');
+            const source = document.getElementById('videoSource');
+            source.src = "/static/uploads/" + data.filename;
+            document.getElementById('videoWrapper').style.display = "block";
+            player.load();
+            player.play().catch(() => { player.muted = true; player.play(); });
+        });
+
+        function toggleFullScreen() {
+            const wrap = document.getElementById('videoWrapper');
+            if (!document.fullscreenElement) wrap.requestFullscreen();
+            else document.exitFullscreen();
+        }
+    </script>
+</body>
+</html>
